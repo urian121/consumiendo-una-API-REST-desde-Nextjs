@@ -4,7 +4,7 @@ Este proyecto muestra cómo consumir una API REST en Next.js utilizando el siste
 
 #### Resultado final
 
-![](https://raw.githubusercontent.com/urian121/imagenes-proyectos-github/master/full-stack-laravel10-react-mysql-y-bootstrap.png)
+![](https://raw.githubusercontent.com/urian121/imagenes-proyectos-github/master/consumiendo-api-rest-con-nextjs.png)
 
 ## Requisitos
 
