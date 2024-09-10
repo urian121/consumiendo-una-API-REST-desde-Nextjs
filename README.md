@@ -1,36 +1,110 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Consumiendo una API REST desde Next.js
 
-## Getting Started
+Este proyecto muestra cómo consumir una API REST en Next.js utilizando el sistema de rutas de API en la carpeta `app`.
 
-First, run the development server:
+## Requisitos
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Node.js instalado (v16.8.0 o superior).
+- Tener instalado Next.js en su última versión.
+- Editor de código, como VSCode.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Instalación
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+1. Clona este repositorio en tu máquina local o crea un nuevo proyecto de Next.js.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+   ```bash
+   npx create-next-app@latest nombre-del-proyecto
+   cd nombre-del-proyecto
+   ```
 
-## Learn More
+##### Configuración de la API en Next.js
 
-To learn more about Next.js, take a look at the following resources:
+Paso 1: Crear una API Route
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+En Next.js, las API routes permiten crear endpoints como parte del proyecto. Para este proyecto, vamos a crear un archivo route.js en la carpeta app/api.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+    Crea la carpeta app/api en el directorio raíz de tu proyecto.
 
-## Deploy on Vercel
+    Dentro de app/api, crea un archivo llamado route.js y pega el siguiente código:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+    // app/api/route.js
+    export async function GET(req) {
+    let url_api = "https://reqres.in/api/users";
+    const response = await fetch(url_api);
+    const data = await response.json();
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+    return new Response(JSON.stringify(data), {
+        status: 200,
+        headers: {
+        "Content-Type": "application/json",
+        },
+    });
+    }
+
+Este archivo actúa como un endpoint de tipo GET en /api y hace una solicitud a una API externa (https://reqres.in) para obtener una lista de usuarios.
+
+##### Paso 2: Crear un Componente React para Consumir la API
+
+    Crea un archivo DataPage.js dentro de la carpeta app (o en cualquier otra parte donde desees colocar tu componente).
+    Dentro de DataPage.js, agrega el siguiente código para consumir la API en el lado del cliente:
+
+    "use client";
+    import { useEffect, useState } from "react";
+
+    function DataPage() {
+    const [data, setData] = useState([]);
+
+    useEffect(() => {
+        async function fetchData() {
+        const response = await fetch("/api"); // Llama a la API creada
+        const result = await response.json();
+        console.log(result); // Muestra los datos en la consola
+
+        // Guarda los datos obtenidos
+        setData(result.data);
+        }
+
+        fetchData();
+    }, []);
+
+    return (
+        <div>
+        <h1>Lista de Usuarios</h1>
+        <ul>
+            {data.map((item) => (
+            <li key={item.id}>{item.first_name}</li>
+            ))}
+        </ul>
+        </div>
+    );
+    }
+
+    export default DataPage;
+
+Este componente usa useEffect para hacer la solicitud a la API tan pronto como se carga el componente y muestra los datos en una lista.
+
+##### Paso 3: Mostrar el Componente en la Página
+
+Abre el archivo app/page.js (o index.js si usas el sistema de páginas tradicionales) y reemplaza su contenido con el siguiente:
+
+    import DataPage from './DataPage';
+
+    export default function Home() {
+    return (
+        <div>
+        <DataPage />
+        </div>
+    );
+    }
+
+##### No olvidar hacer esta configuración para poder usar el componente Image de Next.js
+
+    const nextConfig = {
+        images: {
+            domains: ["reqres.in"],
+        },
+    };
+
+#### Ejecutar el Proyecto
+
+    npm run dev
