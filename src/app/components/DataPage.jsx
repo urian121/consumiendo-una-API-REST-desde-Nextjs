@@ -3,16 +3,26 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import "../styles/api.css";
 
+import { showLoading, hideLoading } from "loading-request";
+import "loading-request/dist/index.css";
+
 function DataPage() {
   const [data, setData] = useState([]);
 
   useEffect(() => {
     async function fetchData() {
-      const response = await fetch("/api");
-      const result = await response.json();
-      console.log(result);
+      showLoading({ message: "Cargando API..." });
 
-      setData(result.data);
+      try {
+        const response = await fetch("/api");
+        const result = await response.json();
+        console.log(result);
+        setData(result.data);
+      } catch (error) {
+        console.error("Error al obtener los datos:", error);
+      } finally {
+        hideLoading({ timeLoading: 500 });
+      }
     }
 
     fetchData();
